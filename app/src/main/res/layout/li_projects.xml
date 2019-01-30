@@ -6,11 +6,15 @@
         <variable
             name="project"
             type="com.elegion.test.behancer.ui.projects.ProjectListItemViewModel" />
+        <variable
+            name="onItemClickListener"
+            type="com.elegion.test.behancer.ui.projects.ProjectsAdapter.OnItemClickListener" />
     </data>
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:onClick="@{() -> onItemClickListener.onItemClick(project.userName)}"
         android:layout_marginTop="8dp">
 
         <ImageView

@@ -20,6 +20,7 @@ public class ProjectsHolder extends RecyclerView.ViewHolder {
 
     public void bind(Project item, ProjectsAdapter.OnItemClickListener onItemClickListener) {
         binding.setProject(new ProjectListItemViewModel(item));
+        binding.setOnItemClickListener(onItemClickListener);
         binding.executePendingBindings();
     }
 }
