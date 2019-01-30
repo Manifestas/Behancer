@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data class="ProjectBinding">
 
         <variable
             name="project"
             type="com.elegion.test.behancer.ui.projects.ProjectListItemViewModel" />
+
         <variable
             name="onItemClickListener"
             type="com.elegion.test.behancer.ui.projects.ProjectsAdapter.OnItemClickListener" />
@@ -14,8 +16,8 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:onClick="@{() -> onItemClickListener.onItemClick(project.userName)}"
-        android:layout_marginTop="8dp">
+        android:layout_marginTop="8dp"
+        android:onClick="@{() -> onItemClickListener.onItemClick(project.userName)}">
 
         <ImageView
             android:id="@+id/image"
@@ -23,7 +25,8 @@
             android:layout_height="64dp"
             android:layout_marginStart="8dp"
             android:layout_marginLeft="8dp"
-            android:contentDescription="@string/content_description" />
+            android:contentDescription="@string/content_description"
+            app:imageUrl="@{project.imageUrl}" />
 
         <TextView
             android:id="@+id/tv_name"
