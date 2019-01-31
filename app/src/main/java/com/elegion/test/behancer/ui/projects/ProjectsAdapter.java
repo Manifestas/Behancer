@@ -18,11 +18,12 @@ import java.util.List;
 public class ProjectsAdapter extends RecyclerView.Adapter<ProjectsHolder> {
 
     @NonNull
-    private final List<Project> mProjects = new ArrayList<>();
+    private final List<Project> mProjects;
     private final OnItemClickListener mOnItemClickListener;
 
-    public ProjectsAdapter(OnItemClickListener onItemClickListener) {
+    public ProjectsAdapter(List<Project> projects, OnItemClickListener onItemClickListener) {
         mOnItemClickListener = onItemClickListener;
+        mProjects = projects;
     }
 
     @NonNull
@@ -42,17 +43,6 @@ public class ProjectsAdapter extends RecyclerView.Adapter<ProjectsHolder> {
     @Override
     public int getItemCount() {
         return mProjects.size();
-    }
-
-    public void addData(List<Project> data, boolean isRefreshed) {
-        if (isRefreshed) {
-            mProjects.clear();
-        }
-
-        // TODO: 09.04.2018 ДЗ обработать кейс с data.size == 0 || data == null
-
-        mProjects.addAll(data);
-        notifyDataSetChanged();
     }
 
     public interface OnItemClickListener {
