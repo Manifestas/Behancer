@@ -2,6 +2,7 @@ package com.elegion.test.behancer.ui.projects;
 
 import android.databinding.ObservableArrayList;
 import android.databinding.ObservableBoolean;
+import android.support.v4.widget.SwipeRefreshLayout;
 
 import com.elegion.test.behancer.BuildConfig;
 import com.elegion.test.behancer.data.Storage;
@@ -20,10 +21,20 @@ public class ProjectsViewModel {
     private ObservableBoolean isLoading = new ObservableBoolean(false);
     private ObservableBoolean isErrorVisible = new ObservableBoolean(false);
     private ObservableArrayList<Project> projects = new ObservableArrayList<>();
+    private SwipeRefreshLayout.OnRefreshListener onRefreshListener = new SwipeRefreshLayout.OnRefreshListener() {
+        @Override
+        public void onRefresh() {
+            loadProjects();
+        }
+    };
 
     public ProjectsViewModel(Storage storage, ProjectsAdapter.OnItemClickListener itemClickListener) {
         mStorage = storage;
         this.itemClickListener = itemClickListener;
+    }
+
+    public SwipeRefreshLayout.OnRefreshListener getOnRefreshListener() {
+        return onRefreshListener;
     }
 
     public void loadProjects() {

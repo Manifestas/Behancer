@@ -12,6 +12,7 @@ import android.view.ViewGroup;
 
 import com.elegion.test.behancer.R;
 import com.elegion.test.behancer.data.Storage;
+import com.elegion.test.behancer.databinding.ProjectsBinding;
 import com.elegion.test.behancer.ui.profile.ProfileActivity;
 import com.elegion.test.behancer.ui.profile.ProfileFragment;
 
@@ -49,7 +50,9 @@ public class ProjectsFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fr_projects, container, false);
+        ProjectsBinding binding = ProjectsBinding.inflate(inflater, container, false);
+        binding.setVm(viewModel);
+        return binding.getRoot();
     }
 
     @Override

@@ -2,6 +2,7 @@ package com.elegion.test.behancer.utils;
 
 import android.databinding.BindingAdapter;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.widget.ImageView;
 
@@ -24,6 +25,7 @@ public class CustomBindingAdapter {
     public static void configureRecyclerView(RecyclerView recyclerView, List<Project> projects,
                                              ProjectsAdapter.OnItemClickListener listener) {
         ProjectsAdapter adapter = new ProjectsAdapter(projects, listener);
+        recyclerView.setLayoutManager(new LinearLayoutManager(recyclerView.getContext()));
         recyclerView.setAdapter(adapter);
 
     }
