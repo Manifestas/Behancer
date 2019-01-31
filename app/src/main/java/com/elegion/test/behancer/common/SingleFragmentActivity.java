@@ -15,17 +15,13 @@ import com.elegion.test.behancer.data.Storage;
  * Created by Vladislav Falzan.
  */
 
-public abstract class SingleFragmentActivity extends AppCompatActivity
-        implements Storage.StorageOwner, SwipeRefreshLayout.OnRefreshListener, RefreshOwner {
+public abstract class SingleFragmentActivity extends AppCompatActivity {
 
-    private SwipeRefreshLayout mSwipeRefreshLayout;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.ac_swipe_container);
-        mSwipeRefreshLayout = findViewById(R.id.refresher);
-        mSwipeRefreshLayout.setOnRefreshListener(this);
+        setContentView(getLayout());
 
         if (savedInstanceState == null) {
             changeFragment(getFragment());
@@ -33,12 +29,11 @@ public abstract class SingleFragmentActivity extends AppCompatActivity
 
     }
 
-    protected abstract Fragment getFragment();
+    protected int getLayout() {
+        return R.layout.ac_container;
 
-    @Override
-    public Storage obtainStorage() {
-        return ((AppDelegate) getApplicationContext()).getStorage();
     }
+    protected abstract Fragment getFragment();
 
     public void changeFragment(Fragment fragment) {
         boolean addToBackStack = getSupportFragmentManager().findFragmentById(R.id.fragmentContainer) != null;
@@ -52,20 +47,5 @@ public abstract class SingleFragmentActivity extends AppCompatActivity
         }
 
         transaction.commit();
-    }
-
-    @Override
-    public void onRefresh() {
-        Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.fragmentContainer);
-        if (fragment instanceof Refreshable) {
-            ((Refreshable) fragment).onRefreshData();
-        } else {
-            setRefreshState(false);
-        }
-    }
-
-    @Override
-    public void setRefreshState(boolean refreshing) {
-        mSwipeRefreshLayout.post(() -> mSwipeRefreshLayout.setRefreshing(refreshing));
     }
 }
