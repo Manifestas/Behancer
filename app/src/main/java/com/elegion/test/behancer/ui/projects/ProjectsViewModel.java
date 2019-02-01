@@ -1,7 +1,7 @@
 package com.elegion.test.behancer.ui.projects;
 
-import android.databinding.ObservableArrayList;
-import android.databinding.ObservableBoolean;
+import android.arch.lifecycle.MutableLiveData;
+import android.arch.lifecycle.ViewModel;
 import android.support.v4.widget.SwipeRefreshLayout;
 
 import com.elegion.test.behancer.BuildConfig;
@@ -9,18 +9,21 @@ import com.elegion.test.behancer.data.Storage;
 import com.elegion.test.behancer.data.model.project.Project;
 import com.elegion.test.behancer.utils.ApiUtils;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 
-public class ProjectsViewModel {
+public class ProjectsViewModel extends ViewModel {
 
     private Disposable mDisposable;
     private Storage mStorage;
     private ProjectsAdapter.OnItemClickListener itemClickListener;
-    private ObservableBoolean isLoading = new ObservableBoolean(false);
-    private ObservableBoolean isErrorVisible = new ObservableBoolean(false);
-    private ObservableArrayList<Project> projects = new ObservableArrayList<>();
+    private MutableLiveData<Boolean> isLoading = new MutableLiveData<>();
+    private MutableLiveData<Boolean> isErrorVisible = new MutableLiveData<>();
+    private MutableLiveData<List<Project>> projects = new MutableLiveData<>();
     private SwipeRefreshLayout.OnRefreshListener onRefreshListener = new SwipeRefreshLayout.OnRefreshListener() {
         @Override
         public void onRefresh() {
@@ -31,6 +34,8 @@ public class ProjectsViewModel {
     public ProjectsViewModel(Storage storage, ProjectsAdapter.OnItemClickListener itemClickListener) {
         mStorage = storage;
         this.itemClickListener = itemClickListener;
+        projects.setValue(new ArrayList<>());
+        loadProjects();
     }
 
     public SwipeRefreshLayout.OnRefreshListener getOnRefreshListener() {
@@ -44,15 +49,15 @@ public class ProjectsViewModel {
                         ApiUtils.NETWORK_EXCEPTIONS.contains(throwable.getClass()) ? mStorage.getProjects() : null)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .doOnSubscribe(disposable -> isLoading.set(true))
-                .doFinally(() -> isLoading.set(false))
+                .doOnSubscribe(disposable -> isLoading.postValue(true))
+                .doFinally(() -> isLoading.postValue(false))
                 .subscribe(
                         response -> {
-                            isErrorVisible.set(false);
-                            projects.addAll(response.getProjects());
+                            isErrorVisible.postValue(false);
+                            projects.postValue(response.getProjects());
                         },
                         throwable -> {
-                            isErrorVisible.set(true);
+                            isErrorVisible.postValue(true);
                         });
     }
 
@@ -60,19 +65,32 @@ public class ProjectsViewModel {
         return itemClickListener;
     }
 
-    public ObservableBoolean getIsLoading() {
+    public MutableLiveData<Boolean> getIsLoading() {
         return isLoading;
     }
 
-    public ObservableBoolean getIsErrorVisible() {
+    public void setIsLoading(MutableLiveData<Boolean> isLoading) {
+        this.isLoading = isLoading;
+    }
+
+    public MutableLiveData<Boolean> getIsErrorVisible() {
         return isErrorVisible;
     }
 
-    public ObservableArrayList<Project> getProjects() {
+    public void setIsErrorVisible(MutableLiveData<Boolean> isErrorVisible) {
+        this.isErrorVisible = isErrorVisible;
+    }
+
+    public MutableLiveData<List<Project>> getProjects() {
         return projects;
     }
 
-    public void dispatchDetach() {
+    public void setProjects(MutableLiveData<List<Project>> projects) {
+        this.projects = projects;
+    }
+
+    @Override
+    public void onCleared() {
         mStorage = null;
         if (mDisposable != null) {
             mDisposable.dispose();

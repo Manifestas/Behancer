@@ -1,5 +1,6 @@
 package com.elegion.test.behancer.ui.projects;
 
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -15,6 +16,7 @@ import com.elegion.test.behancer.data.Storage;
 import com.elegion.test.behancer.databinding.ProjectsBinding;
 import com.elegion.test.behancer.ui.profile.ProfileActivity;
 import com.elegion.test.behancer.ui.profile.ProfileFragment;
+import com.elegion.test.behancer.utils.CustomFactory;
 
 /**
  * Created by Vladislav Falzan.
@@ -43,7 +45,8 @@ public class ProjectsFragment extends Fragment {
         super.onAttach(context);
         if (context instanceof Storage.StorageOwner) {
             Storage storage = ((Storage.StorageOwner) context).obtainStorage();
-            viewModel = new ProjectsViewModel(storage, onItemClickListener);
+            CustomFactory factory = new CustomFactory(storage, onItemClickListener);
+            viewModel = ViewModelProviders.of(this, factory).get(ProjectsViewModel.class);
         }
     }
 
@@ -52,6 +55,7 @@ public class ProjectsFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         ProjectsBinding binding = ProjectsBinding.inflate(inflater, container, false);
         binding.setVm(viewModel);
+        binding.setLifecycleOwner(this);
         return binding.getRoot();
     }
 
@@ -62,14 +66,6 @@ public class ProjectsFragment extends Fragment {
         if (getActivity() != null) {
             getActivity().setTitle(R.string.projects);
         }
-
-        viewModel.loadProjects();
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        viewModel.dispatchDetach();
     }
 }
 
