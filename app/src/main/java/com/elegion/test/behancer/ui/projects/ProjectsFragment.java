@@ -58,14 +58,5 @@ public class ProjectsFragment extends Fragment {
         binding.setLifecycleOwner(this);
         return binding.getRoot();
     }
-
-    @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-
-        if (getActivity() != null) {
-            getActivity().setTitle(R.string.projects);
-        }
-    }
 }
 
