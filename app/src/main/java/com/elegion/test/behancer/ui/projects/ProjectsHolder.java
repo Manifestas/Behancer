@@ -2,7 +2,7 @@ package com.elegion.test.behancer.ui.projects;
 
 import android.support.v7.widget.RecyclerView;
 
-import com.elegion.test.behancer.data.model.project.Project;
+import com.elegion.test.behancer.data.model.project.RichProject;
 import com.elegion.test.behancer.databinding.ProjectBinding;
 
 /**
@@ -18,7 +18,7 @@ public class ProjectsHolder extends RecyclerView.ViewHolder {
         this.binding = binding;
     }
 
-    public void bind(Project item, ProjectsAdapter.OnItemClickListener onItemClickListener) {
+    public void bind(RichProject item, ProjectsAdapter.OnItemClickListener onItemClickListener) {
         binding.setProject(new ProjectListItemViewModel(item));
         binding.setOnItemClickListener(onItemClickListener);
         binding.executePendingBindings();

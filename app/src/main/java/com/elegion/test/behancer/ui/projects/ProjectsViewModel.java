@@ -1,18 +1,18 @@
 package com.elegion.test.behancer.ui.projects;
 
+import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.ViewModel;
 import android.support.v4.widget.SwipeRefreshLayout;
 
 import com.elegion.test.behancer.BuildConfig;
 import com.elegion.test.behancer.data.Storage;
-import com.elegion.test.behancer.data.model.project.Project;
+import com.elegion.test.behancer.data.model.project.ProjectResponse;
+import com.elegion.test.behancer.data.model.project.RichProject;
 import com.elegion.test.behancer.utils.ApiUtils;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 
@@ -23,41 +23,33 @@ public class ProjectsViewModel extends ViewModel {
     private ProjectsAdapter.OnItemClickListener itemClickListener;
     private MutableLiveData<Boolean> isLoading = new MutableLiveData<>();
     private MutableLiveData<Boolean> isErrorVisible = new MutableLiveData<>();
-    private MutableLiveData<List<Project>> projects = new MutableLiveData<>();
-    private SwipeRefreshLayout.OnRefreshListener onRefreshListener = new SwipeRefreshLayout.OnRefreshListener() {
-        @Override
-        public void onRefresh() {
-            loadProjects();
-        }
-    };
+    private LiveData<List<RichProject>> projects;
+    private SwipeRefreshLayout.OnRefreshListener onRefreshListener = this::updateProjects;
 
     public ProjectsViewModel(Storage storage, ProjectsAdapter.OnItemClickListener itemClickListener) {
         mStorage = storage;
         this.itemClickListener = itemClickListener;
-        projects.setValue(new ArrayList<>());
-        loadProjects();
+        projects = storage.getProjectsLive();
+        updateProjects();
     }
 
     public SwipeRefreshLayout.OnRefreshListener getOnRefreshListener() {
         return onRefreshListener;
     }
 
-    public void loadProjects() {
+    private void updateProjects() {
         mDisposable = ApiUtils.getApiService().getProjects(BuildConfig.API_QUERY)
-                .doOnSuccess(response -> mStorage.insertProjects(response))
-                .onErrorReturn(throwable ->
-                        ApiUtils.NETWORK_EXCEPTIONS.contains(throwable.getClass()) ? mStorage.getProjects() : null)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
+                .map(ProjectResponse::getProjects)
                 .doOnSubscribe(disposable -> isLoading.postValue(true))
                 .doFinally(() -> isLoading.postValue(false))
+                .doOnSuccess(response -> isErrorVisible.postValue(false))
+                .subscribeOn(Schedulers.io())
                 .subscribe(
-                        response -> {
-                            isErrorVisible.postValue(false);
-                            projects.postValue(response.getProjects());
-                        },
+                        response -> mStorage.insertProjects(response),
                         throwable -> {
                             isErrorVisible.postValue(true);
+                            boolean value = projects.getValue() == null || projects.getValue().size() == 0;
+                            isErrorVisible.postValue(value);
                         });
     }
 
@@ -81,11 +73,11 @@ public class ProjectsViewModel extends ViewModel {
         this.isErrorVisible = isErrorVisible;
     }
 
-    public MutableLiveData<List<Project>> getProjects() {
+    public LiveData<List<RichProject>> getProjects() {
         return projects;
     }
 
-    public void setProjects(MutableLiveData<List<Project>> projects) {
+    public void setProjects(LiveData<List<RichProject>> projects) {
         this.projects = projects;
     }
 
