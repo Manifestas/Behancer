@@ -39,8 +39,9 @@ public interface BehanceDao {
     @Query("select * from project")
     List<Project> getProjects();
 
-    @Query("select * from project")
+    @Query("select * from project order by published_on desc")
     LiveData<List<RichProject>> getProjectsLive();
+
     @Query("select * from owner where project_id = :projectId")
     List<Owner> getOwnersFromProject(int projectId);
 
